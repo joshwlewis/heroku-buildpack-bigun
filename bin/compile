@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir> <env-dir>
+
+# Configure environment
+set -e            # fail fast
+set -o pipefail   # do not ignore exit codes when piping output
+# set -x            # enable debugging
+
+# Clean up leaking environment
+unset GIT_DIR
+
+# Directories
+mkdir -p "$1" "$2" "$3"
+BUILD_DIR=$(cd "$1/" && pwd)
+ENV_DIR=$(cd "$3/" && pwd)
+
+# Detect desired file size
+if [ -f $ENV_DIR/BIGUN_FILE_SIZE ]; then
+  FILE_SIZE=$(cat $ENV_DIR/BIGUN_FILE_SIZE)
+else
+  FILE_SIZE=250
+fi
+
+echo "-----> Installing $FILE_SIZE MB bigun.txt"
+openssl rand -out $BUILD_DIR/bigun.txt -base64 $(($FILE_SIZE * 2**20 * 3/4 ))
+echo "       bigun.txt installed"
+
+exit 0
